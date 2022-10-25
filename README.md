@@ -15,4 +15,10 @@ To see the repro:
     1. The build will generate the `.Designer.cs` file, which is not checked in.
     2. You will see a warning: `CSC : warning CS2002: Source file '/.../src/ResxRepro/MyResources.Designer.cs' specified multiple times [/.../src/ResxRepro/ResxRepro.csproj]`
 
-It does not appear that there is a way to both get build analysis to work _and_ get rid of the CS2002 warning. Using `<Compile Remove>` solves the warning, but it seems like that should also actually remove the `.Designer.cs` file from being compiled... and it doesn't. Conversely, without it, you get a warning that somehow it's being included multiple times, which doesn't seem correct.
+The branch `issuecomment-1290568321` contains some fixes/updates from [this issue comment](https://github.com/dotnet/msbuild/issues/8086#issuecomment-1290568321) that help resolve a few things:
+
+- Instead of using `ResXFileCodeGenerator` for the resource generator, it uses `MSBuild:Compile`. This is different than what you might see in Visual Studio.
+- The generated files go into the `obj` folder so you don't need the `<Compile Remove>` part. This gets rid of the CS2002 warning.
+- In order to get OmniSharp to see the generated resources, you need to add to `<Properties>` a line `<CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn>` - this is because OmniSharp calls the build in a way that skips resource generation.
+
+That branch appears to work around some of the challenges, but it does seem like this should be easier (which is tracked in [MSBuild issue 4751](https://github.com/dotnet/msbuild/issues/4751)).
