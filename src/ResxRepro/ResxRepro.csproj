@@ -3,27 +3,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn>
   </PropertyGroup>
   <ItemGroup>
-    <!--
-      This 'Compile Remove' is the solution to removing the CS2002 warning.
-
-      If you leave it here, it seems like .Designer.cs files should not be
-      included in compilation, but it is. With it here, there is no CS2002
-      warning but tools like OmniSharp exclude the .Designer.cs files so
-      analysis is wrong.
-
-      If you comment it out, you get the CS2002 warning that the .Designer.cs
-      file is included multiple times but OmniSharp analysis starts working.
-
-      This is an inconsistency in how resource generation is addressed with
-      respect to compilation.
-    -->
-    <Compile Remove="**/*.Designer.cs" />
     <EmbeddedResource Update="MyResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>MSBuild:Compile</Generator>
       <LastGenOutput>MyResources.Designer.cs</LastGenOutput>
-      <StronglyTypedFileName>MyResources.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedFileName>$(IntermediateOutputPath)\MyResources.Designer.cs</StronglyTypedFileName>
       <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
       <StronglyTypedNamespace>ResxRepro</StronglyTypedNamespace>
       <StronglyTypedClassName>MyResources</StronglyTypedClassName>
